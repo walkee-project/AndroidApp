@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "904550180779",
+    "project_id": "eworld-illumination",
+    "storage_bucket": "eworld-illumination.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:904550180779:android:d2f8019401c4f2474ed4ee",
+        "android_client_info": {
+          "package_name": "com.walkee.walkee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhc9H2hbXDdklDyX-fWqwm-CJ8QSsaA40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
