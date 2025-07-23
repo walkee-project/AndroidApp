@@ -2,22 +2,26 @@ package com.walkee.walkee.Main;
 
 import android.os.Handler;
 import android.webkit.JavascriptInterface;
+import android.app.Activity;
+import android.widget.Toast;
 
 public class AndroidBridge {
-    private final Handler handler = new Handler();
-    private MainActivity mContext;
+    Activity activity;
 
-    public AndroidBridge(MainActivity _mContext) {
-        this.mContext = _mContext;
+    public AndroidBridge(Activity activity) {
+        this.activity = activity;
     }
 
+    // React Native WebView에서 postMessage를 통해 호출되는 함수
     @JavascriptInterface
-    public void QR_Btn() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                mContext.QR_Btn();
-            }
-        });
+    public void postMessage(String message) {
+        if ("EXIT_APP".equals(message)) {
+            // 앱 종료 처리
+            activity.runOnUiThread(() -> {
+                Toast.makeText(activity, "앱을 종료합니다.", Toast.LENGTH_SHORT).show();
+                activity.finishAffinity(); // 모든 액티비티 종료
+            });
+        }
+        // 다른 메시지도 처리 가능
     }
 }

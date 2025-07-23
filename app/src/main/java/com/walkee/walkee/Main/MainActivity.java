@@ -11,7 +11,9 @@ import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
+import android.webkit.WebSettings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,14 +38,15 @@ public class MainActivity extends BaseActivity {
 
     Toast toast;
 
-
-
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_icemain);
         webView = findViewById(R.id.main_view);
+
+        // 쿠키 설정 추가
+        setupCookieManager();
+
         AndroidBridge androidBridge = new AndroidBridge(this);
         webViewSetting(webView, androidBridge);
         FirebaseApp.initializeApp(this);
@@ -51,8 +54,27 @@ public class MainActivity extends BaseActivity {
         //dh.netWorkChecking(this,getSupportFragmentManager());
 
         webView.loadUrl(PageInfo.INDEX_PAGE);
+    }
 
+    // 쿠키 매니저 설정 메소드 추가
+    private void setupCookieManager() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        cookieManager.setAcceptThirdPartyCookies(webView, true);
 
+        // WebView 설정도 함께
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        // 쿠키 동기화 (Android 5.0 이상)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.flush();
+        }
+
+        Log.d("MainActivity", "Cookie manager setup completed");
     }
 
     @Override
@@ -69,22 +91,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (System.currentTimeMillis() > backKeyPressedTime + 1000) {
-            backKeyPressedTime = System.currentTimeMillis();
-            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT);
-            toast.show();
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    toast.cancel();
-                }
-            }, 500);
-            return;
-        } else if (System.currentTimeMillis() <= backKeyPressedTime + 1000) {
-            finishAffinity();
-        }
+        // 그냥 back 메시지 하나만 보냄
+        webView.evaluateJavascript("window.dispatchEvent(new CustomEvent('ANDROID_BACK'))", null);
     }
 
     public void QR_Btn() {
@@ -110,12 +118,21 @@ public class MainActivity extends BaseActivity {
             script.append("javascript:output('" + ScanResult + "')");
 
             webView.evaluateJavascript(String.valueOf(script), null);
-
         }
+
+
 
 //        Intent intent = new Intent();
 //        intent.putExtra("result",result.getContents());
 //        setResult(RESULT_OK, intent);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 쿠키 동기화 (메모리에서 디스크로)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().flush();
+        }
     }
 }
