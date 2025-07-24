@@ -2,32 +2,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        tools:ignore="CoarseFineLocation" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+    <!-- 인터넷 관련 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-
-
-    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 파일 접근 권한 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- 위치 권한 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- 카메라 기능 필수 선언 -->
+    <!-- 카메라 권한 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!-- 전화 관련 권한 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+
+    <!-- 하드웨어 기능 선언 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
+    <!-- ZXing 라이브러리 설정 -->
+    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
     <application
         android:allowBackup="true"
@@ -49,16 +48,17 @@
         </service>
 
         <activity android:name="com.walkee.walkee.Common.BaseActivity" />
+
         <activity
             android:name="com.walkee.walkee.Splash.SplashAct"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.walkee.walkee.Main.MainActivity" />
-    </application>
 
+        <activity android:name="com.walkee.walkee.Main.MainActivity" />
+
+    </application>
 </manifest>
