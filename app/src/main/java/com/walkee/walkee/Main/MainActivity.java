@@ -166,7 +166,7 @@ public class MainActivity extends BaseActivity {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     Log.w("MainActivity", "Permission denied: " + permissions[i]);
-                    Toast.makeText(this, permissions[i] + " 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, permissions[i] + " 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d("MainActivity", "Permission granted: " + permissions[i]);
                 }
@@ -178,11 +178,6 @@ public class MainActivity extends BaseActivity {
     public void onBackPressed() {
         // 그냥 back 메시지 하나만 보냄
         webView.evaluateJavascript("window.dispatchEvent(new CustomEvent('ANDROID_BACK'))", null);
-    }
-
-    public void QR_Btn() {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.initiateScan();
     }
 
     @Override
