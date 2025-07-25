@@ -59,22 +59,18 @@ public class MainActivity extends BaseActivity {
         // 쿠키 설정 추가
         setupCookieManager();
 
-        // WebChromeClient 설정 추가
-        setupWebChromeClient();
-
         FirebaseApp.initializeApp(this);
         //DisconnectHandler dh = new DisconnectHandler(this,this);
         //dh.netWorkChecking(this,getSupportFragmentManager());
 
-// ✅ 이 줄 추가!
+        // AndroidBridge 설정
         AndroidBridge androidBridge = new AndroidBridge(this);
-        webView.addJavascriptInterface(androidBridge, "AndroidBridge");
-        webView.getSettings().setJavaScriptEnabled(true);
 
-
-// WebView 설정
+        // 기존 webViewSetting 호출 (이게 먼저 실행되어야 함)
         webViewSetting(webView, androidBridge);
 
+        // WebChromeClient 설정을 webViewSetting 호출 AFTER에 해야 함
+        setupWebChromeClient();
 
         webView.loadUrl(PageInfo.INDEX_PAGE);
     }
@@ -94,6 +90,7 @@ public class MainActivity extends BaseActivity {
 
     // WebChromeClient 설정 메소드 추가
     private void setupWebChromeClient() {
+        // 기존 WebChromeClient를 확장하는 방식으로 변경
         webView.setWebChromeClient(new WebChromeClient() {
             // 위치 권한 처리
             @Override
@@ -126,7 +123,16 @@ public class MainActivity extends BaseActivity {
                 }
                 return true;
             }
+
+            // 진행률 표시 (선택사항)
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                Log.d("MainActivity", "Progress: " + newProgress + "%");
+            }
         });
+
+        Log.d("MainActivity", "WebChromeClient setup completed");
     }
 
     // 쿠키 매니저 설정 메소드 (기존 + 추가 설정)
@@ -156,6 +162,11 @@ public class MainActivity extends BaseActivity {
         Log.d("MainActivity", "Cookie manager and WebView settings completed");
     }
 
+    public void QR_Btn() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.initiateScan();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -173,7 +184,7 @@ public class MainActivity extends BaseActivity {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     Log.w("MainActivity", "Permission denied: " + permissions[i]);
-//                    Toast.makeText(this, permissions[i] + " 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(this, permissions[i] + " 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d("MainActivity", "Permission granted: " + permissions[i]);
                 }
@@ -191,26 +202,16 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // QR 코드 스캔 결과 처리 (기존 코드)
-        if(resultCode == Activity.RESULT_OK && requestCode != FILE_CHOOSER_RESULT_CODE){
-            IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        Log.d("MainActivity", "onActivityResult called - requestCode: " + requestCode + ", resultCode: " + resultCode);
 
-            String ScanResult = result.getContents();
-
-            System.out.println("result : " + ScanResult);
-
-            Toast.makeText(this, ScanResult, Toast.LENGTH_LONG).show();
-
-            StringBuilder script = new StringBuilder();
-
-            script.append("javascript:output('" + ScanResult + "')");
-
-            webView.evaluateJavascript(String.valueOf(script), null);
-        }
-
-        // 파일 선택 결과 처리 (새로 추가)
+        // 파일 선택 결과 처리 (먼저 확인)
         if (requestCode == FILE_CHOOSER_RESULT_CODE) {
-            if (mFilePathCallback == null) return;
+            Log.d("MainActivity", "File chooser result received");
+
+            if (mFilePathCallback == null) {
+                Log.w("MainActivity", "mFilePathCallback is null!");
+                return;
+            }
 
             Uri[] results = null;
             if (resultCode == Activity.RESULT_OK && data != null) {
@@ -219,19 +220,31 @@ public class MainActivity extends BaseActivity {
                     results = new Uri[]{Uri.parse(dataString)};
                     Log.d("MainActivity", "File selected: " + dataString);
                 } else {
-                    Log.d("MainActivity", "No file selected");
+                    Log.d("MainActivity", "No file data string");
                 }
             } else {
-                Log.d("MainActivity", "File chooser cancelled");
+                Log.d("MainActivity", "File chooser cancelled or no data");
             }
 
             mFilePathCallback.onReceiveValue(results);
             mFilePathCallback = null;
+            return; // 여기서 리턴해서 QR 처리와 겹치지 않게 함
         }
 
-//        Intent intent = new Intent();
-//        intent.putExtra("result",result.getContents());
-//        setResult(RESULT_OK, intent);
+        // QR 코드 스캔 결과 처리
+        if(resultCode == Activity.RESULT_OK) {
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+            if (result != null && result.getContents() != null) {
+                String ScanResult = result.getContents();
+                Log.d("MainActivity", "QR result: " + ScanResult);
+                Toast.makeText(this, ScanResult, Toast.LENGTH_LONG).show();
+
+                StringBuilder script = new StringBuilder();
+                script.append("javascript:output('" + ScanResult + "')");
+                webView.evaluateJavascript(String.valueOf(script), null);
+            }
+        }
     }
 
     @Override
