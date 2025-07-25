@@ -69,6 +69,8 @@ public class MainActivity extends BaseActivity {
 // ✅ 이 줄 추가!
         AndroidBridge androidBridge = new AndroidBridge(this);
         webView.addJavascriptInterface(androidBridge, "AndroidBridge");
+        webView.getSettings().setJavaScriptEnabled(true);
+
 
 // WebView 설정
         webViewSetting(webView, androidBridge);
