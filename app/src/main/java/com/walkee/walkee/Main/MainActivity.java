@@ -59,11 +59,6 @@ public class MainActivity extends BaseActivity {
         // 쿠키 설정 추가
         setupCookieManager();
 
-        AndroidBridge androidBridge = new AndroidBridge(this);
-        webViewSetting(webView, androidBridge);
-
-        webView.addJavascriptInterface(androidBridge, "AndroidBridge");
-
         // WebChromeClient 설정 추가
         setupWebChromeClient();
 
@@ -72,6 +67,7 @@ public class MainActivity extends BaseActivity {
         //dh.netWorkChecking(this,getSupportFragmentManager());
 
 // ✅ 이 줄 추가!
+        AndroidBridge androidBridge = new AndroidBridge(this);
         webView.addJavascriptInterface(androidBridge, "AndroidBridge");
 
 // WebView 설정

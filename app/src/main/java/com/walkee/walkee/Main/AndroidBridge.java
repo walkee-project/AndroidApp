@@ -20,6 +20,7 @@ public class AndroidBridge {
     public void postMessage(String message) {
         if ("EXIT_APP".equals(message)) {
             Log.d(TAG, "postMessage called with message: " + message);
+            Toast.makeText(activity, "JS에서 전달받은 메시지: " + message, Toast.LENGTH_SHORT).show();
 
             activity.runOnUiThread(() -> {
                 activity.finishAffinity();
