@@ -69,6 +69,13 @@ public class MainActivity extends BaseActivity {
         //DisconnectHandler dh = new DisconnectHandler(this,this);
         //dh.netWorkChecking(this,getSupportFragmentManager());
 
+// ✅ 이 줄 추가!
+        webView.addJavascriptInterface(androidBridge, "AndroidBridge");
+
+// WebView 설정
+        webViewSetting(webView, androidBridge);
+
+
         webView.loadUrl(PageInfo.INDEX_PAGE);
     }
 

@@ -16,12 +16,15 @@ public class AndroidBridge {
     @JavascriptInterface
     public void postMessage(String message) {
         if ("EXIT_APP".equals(message)) {
-            // 앱 종료 처리
             activity.runOnUiThread(() -> {
                 Toast.makeText(activity, "앱을 종료합니다.", Toast.LENGTH_SHORT).show();
-                activity.finishAffinity(); // 모든 액티비티 종료
+
+                // ✅ 확실하게 종료 처리
+                activity.finishAffinity();
+                System.runFinalization();
+                System.exit(0);  // 강제 종료
             });
         }
-        // 다른 메시지도 처리 가능
     }
+
 }
