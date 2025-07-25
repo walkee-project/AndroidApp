@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.flash21.For_wooSung",
+  "applicationId": "com.walkee.walkee",
   "variantName": "release",
   "elements": [
     {
@@ -16,5 +16,6 @@
       "outputFile": "app-release.apk"
     }
   ],
-  "elementType": "File"
+  "elementType": "File",
+  "minSdkVersionForDexing": 24
 }
