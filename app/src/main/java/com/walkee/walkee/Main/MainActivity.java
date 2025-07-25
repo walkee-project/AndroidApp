@@ -62,6 +62,8 @@ public class MainActivity extends BaseActivity {
         AndroidBridge androidBridge = new AndroidBridge(this);
         webViewSetting(webView, androidBridge);
 
+        webView.addJavascriptInterface(androidBridge, "AndroidBridge")
+
         // WebChromeClient 설정 추가
         setupWebChromeClient();
 
